@@ -27,7 +27,15 @@ foreach ($match[0] as $key => $value) {
 	if (!in_array($hash, $old)) {
 		if ($cfg['archive']['on']) {
 			echo " archiving";
-			system("curl https://web.archive.org/save/".$match[4][$key]." > /dev/null 2>&1");
+			if ($cfg['archive']['archive.org']) {
+				system("curl -s -o /dev/null/ https://web.archive.org/save/".$match[4][$key]);
+				echo " archive.org";
+			}
+			if ($cfg['archive']['archive.is']) {
+				system("curl -s -o /dev/null/ https://archive.is/submit/ -d 'url=".$match[4][$key]."&anyway=1'");
+				echo " archive.is";
+			}
+			echo "done";
 		}
 		$query = new query;
 		$query->value = array(
@@ -44,7 +52,15 @@ foreach ($match[0] as $key => $value) {
 	} else echo " Old\n";
 }
 if ($new_cnt && $cfg['archive']['on']) {
-	echo "list archiving\n";
-	system("curl https://web.archive.org/save/".$cfg['fetch']." > /dev/null 2>&1");
+	echo "list archiving";
+	if ($cfg['archive']['archive.org']) {
+		system("curl -s -o /dev/null/ https://web.archive.org/save/".$cfg['fetch']);
+		echo " archive.org";
+	}
+	if ($cfg['archive']['archive.is']) {
+		system("curl -s -o /dev/null/ https://archive.is/submit/ -d 'url=".$cfg['fetch']."&anyway=1'");
+		echo " archive.is";
+	}
+	echo "done\n";
 }
 ?>
