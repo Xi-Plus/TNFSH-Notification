@@ -1,18 +1,21 @@
 <?php
-if (PHP_SAPI != "cli") {
+require(__DIR__.'/config/config.php');
+
+if (!in_array(PHP_SAPI, array("cli", "apache2handler"))) {
 	exit("No permission");
 }
-require_once(__DIR__.'/function/SQL-function/sql.php');
-require_once(__DIR__.'/config/config.php');
+define("EOL", (PHP_SAPI==="apache2handler"?"<br>\n":PHP_EOL));
 
-$query = new query;
-$row = $query->SELECT();
+$sth = $G["db"]->prepare("SELECT * FROM `".$C['DBTBprefix']."log`");
+$sth->execute();
+$row = $sth->fetchAll(PDO::FETCH_ASSOC);
+
 $old = array();
 foreach ($row as $temp) {
 	$old[] = $temp["hash"];
 }
 
-$html = file_get_contents($cfg['fetch']);
+$html = file_get_contents($C['fetch']);
 $start = strpos($html, "日期");
 $html = substr($html, $start);
 $html = str_replace(array("\n", "\t"), "", $html);
@@ -25,42 +28,37 @@ foreach ($match[0] as $key => $value) {
 	echo $match[5][$key];
 	$hash = md5(serialize($data));
 	if (!in_array($hash, $old)) {
-		if ($cfg['archive']['on']) {
-			echo " archiving";
-			if ($cfg['archive']['archive.org']) {
-				system("curl -s -o /dev/null/ https://web.archive.org/save/".$match[4][$key]);
-				echo " archive.org";
-			}
-			if ($cfg['archive']['archive.is']) {
-				system("curl -s -o /dev/null/ https://archive.is/submit/ -d 'url=".$match[4][$key]."&anyway=1'");
-				echo " archive.is";
-			}
-			echo "done";
+		if ($C['archive']['archive.org']) {
+			system("curl -s -o /dev/null/ https://web.archive.org/save/".$match[4][$key]);
+			echo " archive.org";
 		}
-		$query = new query;
-		$query->value = array(
-			array("date", $match[1][$key]."-".$match[2][$key]."-".$match[3][$key]),
-			array("text", $match[5][$key]),
-			array("department", $match[6][$key]),
-			array("url", $match[4][$key]),
-			array("hash", $hash)
-		);
-		$query->INSERT();
+		if ($C['archive']['archive.is']) {
+			system("curl -s -o /dev/null/ https://archive.is/submit/ -d 'url=".$match[4][$key]."&anyway=1'");
+			echo " archive.is";
+		}
+		$sth = $G["db"]->prepare("INSERT INTO `".$C['DBTBprefix']."log` (`date`, `text`, `department`, `url`, `hash`) VALUES (:date, :text, :department, :url, :hash)");
+		$sth->bindValue(":date", $match[1][$key]."-".$match[2][$key]."-".$match[3][$key]);
+		$sth->bindValue(":text", $match[5][$key]);
+		$sth->bindValue(":department", $match[6][$key]);
+		$sth->bindValue(":url", $match[4][$key]);
+		$sth->bindValue(":hash", $hash);
+		$sth->execute();
+
 		$old[] = $hash;
-		echo " New\n";
+		echo " New".EOL;
 		$new_cnt++;
-	} else echo " Old\n";
+	} else echo " Old".EOL;
 }
-if ($new_cnt && $cfg['archive']['on']) {
+if ($new_cnt) {
 	echo "list archiving";
-	if ($cfg['archive']['archive.org']) {
-		system("curl -s -o /dev/null/ https://web.archive.org/save/".$cfg['fetch']);
+	if ($C['archive']['archive.org']) {
+		system("curl -s -o /dev/null/ https://web.archive.org/save/".$C['fetch']);
 		echo " archive.org";
 	}
-	if ($cfg['archive']['archive.is']) {
-		system("curl -s -o /dev/null/ https://archive.is/submit/ -d 'url=".$cfg['fetch']."&anyway=1'");
+	if ($C['archive']['archive.is']) {
+		system("curl -s -o /dev/null/ https://archive.is/submit/ -d 'url=".$C['fetch']."&anyway=1'");
 		echo " archive.is";
 	}
-	echo "done\n";
+	echo "done".EOL;
 }
 ?>
