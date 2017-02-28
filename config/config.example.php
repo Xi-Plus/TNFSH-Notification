@@ -3,7 +3,8 @@
 $C['archive']['archive.org'] = true;
 $C['archive']['archive.is'] = true;
 
-$C['fb']['page_id'] = '589448474491665';
+$C['FBpageid'] = 'page_id';
+$C['FBpagetoken'] = 'page_token';
 
 $C["DBhost"] = 'localhost';
 $C['DBname'] = 'dbname';
