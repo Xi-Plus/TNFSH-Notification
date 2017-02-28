@@ -6,7 +6,7 @@ if (!in_array(PHP_SAPI, array("cli", "apache2handler"))) {
 }
 define("EOL", (PHP_SAPI==="apache2handler"?"<br>\n":PHP_EOL));
 
-$sth = $G["db"]->prepare("SELECT * FROM `".$C['DBTBprefix']."log`");
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}log`");
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
