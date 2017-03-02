@@ -140,8 +140,8 @@ foreach ($row as $data) {
 							SendMessage($tmid, $M["/last1_arg1_less_than_1"]);
 							continue;
 						}
-						if ($b > 5) {
-							SendMessage($tmid, $M["/last1_arg1_more_than_5"]);
+						if ($b > $C['/last_limit']) {
+							SendMessage($tmid, $M["/last1_arg1_limit_exceeded"]);
 							continue;
 						}
 					}
@@ -164,8 +164,8 @@ foreach ($row as $data) {
 							SendMessage($tmid, $M["/last_arg2_less_than_1"]);
 							continue;
 						}
-						if ($b > 5) {
-							SendMessage($tmid, $M["/last2_arg2_more_than_5"]);
+						if ($b > $C['/last_limit']) {
+							SendMessage($tmid, $M["/last2_arg2_limit_exceeded"]);
 							continue;
 						}
 					}
