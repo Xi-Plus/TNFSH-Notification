@@ -144,11 +144,10 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 						if ($row === false) {
 							SendMessage($tmid, $M["/last_no_result"]);
 						} else {
-							$msg = "";
-							foreach ($row as $temp) {
-								$msg = date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"]."\n\n".$msg;
+							foreach (array_reverse($row) as $temp) {
+								$msg = date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"]."\n\n";
+								SendMessage($tmid, $msg);
 							}
-							SendMessage($tmid, $msg);
 						}
 					} else {
 						WriteLog("last fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
