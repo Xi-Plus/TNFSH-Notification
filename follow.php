@@ -142,7 +142,7 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 						} else {
 							$msg = "";
 							foreach ($row as $temp) {
-								$msg .= date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"]."\n\n";
+								$msg = date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"]."\n\n".$msg;
 							}
 							SendMessage($tmid, $msg);
 						}
