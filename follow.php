@@ -2,6 +2,7 @@
 date_default_timezone_set("Asia/Taipei");
 require(__DIR__.'/config/config.php');
 require(__DIR__.'/curl.php');
+require(__DIR__.'/log.php');
 
 $method = $_SERVER['REQUEST_METHOD'];
 if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_token'] == $C['FBWHtoken']) {
@@ -18,7 +19,7 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 		$res = cURL($C['FBAPI'].$tmid."/messages", $post);
 		$res = json_encode($res, true);
 		if (isset($res["error"])) {
-			file_put_contents("log/SendMessageFail-".date("Y-m-d-H-i-s").".log", json_encode($res));
+			WriteLog("send message error: tmid=".$tmid." res=".json_encode($res));
 		}
 	}
 	function GetTmid() {
@@ -67,9 +68,9 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 				GetTmid();
 				$sth->execute();
 				$row = $sth->fetch(PDO::FETCH_ASSOC);
-				file_put_contents("log/Fetchtmid-".date("Y-m-d-H-i-s").".log", json_encode($uid));
+				WriteLog("get uid ".$uid);
 				if ($row === false) {
-					file_put_contents("log/tmidNotFound-".date("Y-m-d-H-i-s").".log", json_encode($messaging));
+					WriteLog("uid not found ".json_encode($messaging));
 					continue;
 				}
 			}
