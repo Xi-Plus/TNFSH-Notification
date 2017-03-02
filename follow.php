@@ -175,7 +175,7 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 					$res = $sth->execute();
 					$row = $sth->fetchAll(PDO::FETCH_ASSOC);
 					if ($res) {
-						if ($row === false) {
+						if (count($row) == 0) {
 							SendMessage($tmid, $M["/last_no_result"]);
 						} else {
 							if ($a == 0) {
