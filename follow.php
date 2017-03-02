@@ -120,33 +120,60 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 					break;
 				
 				case '/last':
-					$cnt = 1;
-					if (isset($cmd[1])) {
-						if (is_numeric($cmd[1])) {
-							$cnt = (int)$cmd[1];
-							if ($cnt <= 0) {
-								SendMessage($tmid, $M["/last_cnt_negative"]);
-								continue;
-							}
-						} else {
-							SendMessage($tmid, $M["/last_wrong_cnt"]);
+					$a = 0;
+					$b = 1;
+					if (isset($cmd[1]) && !isset($cmd[2])) {
+						if (!is_numeric($cmd[1])) {
+							SendMessage($tmid, $M["/last1_arg1_notnum"]);
+							continue;
+						}
+						$b = (int)$cmd[1];
+						if ($b < 1) {
+							SendMessage($tmid, $M["/last1_arg1_less_than_1"]);
 							continue;
 						}
 					}
 					if (isset($cmd[2])) {
+						if (!is_numeric($cmd[1])) {
+							SendMessage($tmid, $M["/last2_arg1_notnum"]);
+							continue;
+						}
+						if (!is_numeric($cmd[2])) {
+							SendMessage($tmid, $M["/last_arg2_notnum"]);
+							continue;
+						}
+						$a = (int)$cmd[1];
+						if ($a < 0) {
+							SendMessage($tmid, $M["/last_arg1_less_than_0"]);
+							continue;
+						}
+						$b = (int)$cmd[2];
+						if ($b < 1) {
+							SendMessage($tmid, $M["/last_arg2_less_than_1"]);
+							continue;
+						}
+					}
+					if (isset($cmd[3])) {
 						SendMessage($tmid, $M["/last_too_many_arg"]);
 						continue;
 					}
-					$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news` ORDER BY `time` DESC LIMIT {$cnt}");
+					$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news` ORDER BY `time` DESC LIMIT {$a},{$b}");
 					$res = $sth->execute();
 					$row = $sth->fetchAll(PDO::FETCH_ASSOC);
 					if ($res) {
 						if ($row === false) {
 							SendMessage($tmid, $M["/last_no_result"]);
 						} else {
+							if ($a == 0) {
+								SendMessage($tmid, "顯示最後".$b."筆訊息");
+							} else {
+								SendMessage($tmid, "忽略最後".$a."筆，顯示".$b."筆訊息");
+							}
+							$idx = $a + $b;
 							foreach (array_reverse($row) as $temp) {
-								$msg = date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"]."\n\n";
+								$msg = "#".$idx."\n".date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"];
 								SendMessage($tmid, $msg);
+								$idx --;
 							}
 						}
 					} else {
