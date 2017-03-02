@@ -23,10 +23,15 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 		}
 	}
 	function GetTmid() {
+		global $C, $G;
 		$res = cURL($C['FBAPI']."me/conversations?fields=participants,updated_time&access_token=".$C['FBpagetoken']);
 		$updated_time = file_get_contents("updated_time.txt");
 		$newesttime = $updated_time;
 		while (true) {
+			if ($res === false) {
+				WriteLog("fetch uid: curl fail");
+				break;
+			}
 			$res = json_decode($res, true);
 			if (count($res["data"]) == 0) {
 				break;
@@ -44,7 +49,7 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 						$sth->bindValue(":uid", $participants["id"]);
 						$sth->bindValue(":tmid", $data["id"]);
 						$sth->bindValue(":name", $participants["name"]);
-						$res= $sth->execute();
+						$res = $sth->execute();
 						break;
 					}
 				}
@@ -65,12 +70,12 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 			$sth->execute();
 			$row = $sth->fetch(PDO::FETCH_ASSOC);
 			if ($row === false) {
+				WriteLog("get uid ".$uid);
 				GetTmid();
 				$sth->execute();
 				$row = $sth->fetch(PDO::FETCH_ASSOC);
-				WriteLog("get uid ".$uid);
 				if ($row === false) {
-					WriteLog("uid not found ".json_encode($messaging));
+					WriteLog("uid not found uid=".$uid." res=".json_encode($messaging));
 					continue;
 				}
 			}
