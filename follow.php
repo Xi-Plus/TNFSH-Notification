@@ -94,6 +94,10 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 			$cmd = explode(" ", $msg);
 			switch ($cmd[0]) {
 				case '/start':
+					if (isset($cmd[1])) {
+						SendMessage($tmid, $M["start_too_many_arg"]);
+						continue;
+					}
 					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '1' WHERE `tmid` = :tmid");
 					$sth->bindValue(":tmid", $tmid);
 					$res = $sth->execute();
@@ -106,6 +110,10 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 					break;
 				
 				case '/stop':
+					if (isset($cmd[1])) {
+						SendMessage($tmid, $M["stop_too_many_arg"]);
+						continue;
+					}
 					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '0' WHERE `tmid` = :tmid");
 					$sth->bindValue(":tmid", $tmid);
 					$res = $sth->execute();
