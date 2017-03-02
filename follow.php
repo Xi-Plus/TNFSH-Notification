@@ -121,7 +121,7 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 					$a = 0;
 					$b = 1;
 					if (isset($cmd[1]) && !isset($cmd[2])) {
-						if (!is_numeric($cmd[1])) {
+						if (!ctype_digit($cmd[1])) {
 							SendMessage($tmid, $M["/last1_arg1_notnum"]);
 							continue;
 						}
@@ -136,11 +136,11 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 						}
 					}
 					if (isset($cmd[2])) {
-						if (!is_numeric($cmd[1])) {
+						if (!ctype_digit($cmd[1])) {
 							SendMessage($tmid, $M["/last2_arg1_notnum"]);
 							continue;
 						}
-						if (!is_numeric($cmd[2])) {
+						if (!ctype_digit($cmd[2])) {
 							SendMessage($tmid, $M["/last_arg2_notnum"]);
 							continue;
 						}
