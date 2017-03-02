@@ -124,6 +124,10 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 					if (isset($cmd[1])) {
 						if (is_numeric($cmd[1])) {
 							$cnt = (int)$cmd[1];
+							if ($cnt <= 0) {
+								SendMessage($tmid, $M["/last_cnt_negative"]);
+								continue;
+							}
 						} else {
 							SendMessage($tmid, $M["/last_wrong_cnt"]);
 							continue;
