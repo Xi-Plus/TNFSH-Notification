@@ -9,5 +9,8 @@ function cURL($url, $post=false) {
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
 	$res = curl_exec($ch);
 	curl_close($ch);
+	if ($res === false) {
+		return false;
+	}
 	return $res;
 }
