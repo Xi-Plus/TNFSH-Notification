@@ -183,6 +183,7 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 								SendMessage($tmid, $msg);
 								$idx --;
 							}
+							SendMessage($tmid, "顯示更舊".$b."筆輸入 /last ".($a+$b)." ".$b);
 						}
 					} else {
 						WriteLog("last fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
