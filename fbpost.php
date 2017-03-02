@@ -16,7 +16,7 @@ if (count($row) == 0) {
 
 $message="";
 foreach ($row as $temp) {
-	$message .= date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"]."\n";
+	$message .= date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"]."\n\n";
 }
 
 $ch = curl_init();
