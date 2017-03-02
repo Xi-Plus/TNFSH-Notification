@@ -132,6 +132,10 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 							SendMessage($tmid, $M["/last1_arg1_less_than_1"]);
 							continue;
 						}
+						if ($b > 5) {
+							SendMessage($tmid, $M["/last1_arg1_more_than_5"]);
+							continue;
+						}
 					}
 					if (isset($cmd[2])) {
 						if (!is_numeric($cmd[1])) {
@@ -150,6 +154,10 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 						$b = (int)$cmd[2];
 						if ($b < 1) {
 							SendMessage($tmid, $M["/last_arg2_less_than_1"]);
+							continue;
+						}
+						if ($b > 5) {
+							SendMessage($tmid, $M["/last2_arg2_more_than_5"]);
 							continue;
 						}
 					}
