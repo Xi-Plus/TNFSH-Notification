@@ -97,8 +97,7 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '1' WHERE `tmid` = :tmid");
 					$sth->bindValue(":tmid", $tmid);
 					$res = $sth->execute();
-					$cnt = $sth->rowCount();
-					if ($res && $cnt == 1) {
+					if ($res) {
 						SendMessage($tmid, $M["start"]);
 					} else {
 						WriteLog("start fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
@@ -110,8 +109,7 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '0' WHERE `tmid` = :tmid");
 					$sth->bindValue(":tmid", $tmid);
 					$res = $sth->execute();
-					$cnt = $sth->rowCount();
-					if ($res && $cnt == 1) {
+					if ($res) {
 						SendMessage($tmid, $M["stop"]);
 					} else {
 						WriteLog("stop fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
