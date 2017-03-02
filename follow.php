@@ -4,60 +4,60 @@ require(__DIR__.'/config/config.php');
 require(__DIR__.'/curl.php');
 require(__DIR__.'/log.php');
 
-$method = $_SERVER['REQUEST_METHOD'];
-if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_token'] == $C['FBWHtoken']) {
-	echo $_GET['hub_challenge'];
-} else if ($method == 'POST') {
-	$inputJSON = file_get_contents('php://input');
-	$input = json_decode($inputJSON, true);
-	function SendMessage($tmid, $message, $token) {
-		global $C;
-		$post = array(
-			"message" => $message,
-			"access_token" => $C['FBpagetoken']
-		);
-		$res = cURL($C['FBAPI'].$tmid."/messages", $post);
-		$res = json_encode($res, true);
-		if (isset($res["error"])) {
-			WriteLog("send message error: tmid=".$tmid." res=".json_encode($res));
-		}
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}input` ORDER BY `time` ASC");
+$res = $sth->execute();
+$row = $sth->fetchAll(PDO::FETCH_ASSOC);
+function SendMessage($tmid, $message) {
+	global $C;
+	$post = array(
+		"message" => $message,
+		"access_token" => $C['FBpagetoken']
+	);
+	$res = cURL($C['FBAPI'].$tmid."/messages", $post);
+	WriteLog("send message: tmid=".$tmid." message=".$message);
+	$res = json_encode($res, true);
+	if (isset($res["error"])) {
+		WriteLog("send message error: tmid=".$tmid." res=".json_encode($res));
 	}
-	function GetTmid() {
-		global $C, $G;
-		$res = cURL($C['FBAPI']."me/conversations?fields=participants,updated_time&access_token=".$C['FBpagetoken']);
-		$updated_time = file_get_contents("updated_time.txt");
-		$newesttime = $updated_time;
-		while (true) {
-			if ($res === false) {
-				WriteLog("fetch uid: curl fail");
-				break;
-			}
-			$res = json_decode($res, true);
-			if (count($res["data"]) == 0) {
-				break;
-			}
-			foreach ($res["data"] as $data) {
-				if ($data["updated_time"] <= $updated_time) {
-					break 2;
-				}
-				if ($data["updated_time"] > $newesttime) {
-					$newesttime = $data["updated_time"];
-				}
-				foreach ($data["participants"]["data"] as $participants) {
-					if ($participants["id"] != $C['FBpageid']) {
-						$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}user` (`uid`, `tmid`, `name`) VALUES (:uid, :tmid, :name)");
-						$sth->bindValue(":uid", $participants["id"]);
-						$sth->bindValue(":tmid", $data["id"]);
-						$sth->bindValue(":name", $participants["name"]);
-						$res = $sth->execute();
-						break;
-					}
-				}
-			}
-			$res = cURL($res["paging"]["next"]);
+}
+function GetTmid() {
+	global $C, $G;
+	$res = cURL($C['FBAPI']."me/conversations?fields=participants,updated_time&access_token=".$C['FBpagetoken']);
+	$updated_time = file_get_contents("updated_time.txt");
+	$newesttime = $updated_time;
+	while (true) {
+		if ($res === false) {
+			WriteLog("fetch uid: curl fail");
+			break;
 		}
-		file_put_contents("updated_time.txt", $newesttime);
+		$res = json_decode($res, true);
+		if (count($res["data"]) == 0) {
+			break;
+		}
+		foreach ($res["data"] as $data) {
+			if ($data["updated_time"] <= $updated_time) {
+				break 2;
+			}
+			if ($data["updated_time"] > $newesttime) {
+				$newesttime = $data["updated_time"];
+			}
+			foreach ($data["participants"]["data"] as $participants) {
+				if ($participants["id"] != $C['FBpageid']) {
+					$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}user` (`uid`, `tmid`, `name`) VALUES (:uid, :tmid, :name)");
+					$sth->bindValue(":uid", $participants["id"]);
+					$sth->bindValue(":tmid", $data["id"]);
+					$sth->bindValue(":name", $participants["name"]);
+					$res = $sth->execute();
+					break;
+				}
+			}
+		}
+		$res = cURL($res["paging"]["next"]);
 	}
+	file_put_contents("updated_time.txt", $newesttime);
+}
+foreach ($row as $data) {
+	$input = json_decode($data["input"], true);
 	foreach ($input['entry'] as $entry) {
 		foreach ($entry['messaging'] as $messaging) {
 			$mmid = "m_".$messaging['message']['mid'];
@@ -77,6 +77,8 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 				if ($row === false) {
 					WriteLog("uid not found uid=".$uid." res=".json_encode($messaging));
 					continue;
+				} else {
+					WriteLog("new user: uid=".$uid);
 				}
 			}
 			$tmid = $row["tmid"];
@@ -207,4 +209,7 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 			}
 		}
 	}
+	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}input` WHERE `hash` = :hash");
+	$sth->bindValue(":hash", $data["hash"]);
+	$res = $sth->execute();
 }
