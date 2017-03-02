@@ -75,13 +75,53 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 				}
 			}
 			$tmid = $row["tmid"];
-			$name = $row["name"];
 			if (!isset($messaging['message']['text'])) {
-				SendMessage($tmid, "僅接受文字訊息");
+				SendMessage($tmid, $M["nottext"]);
 				continue;
 			}
-			$message = $messaging['message']['text'];
-			SendMessage($tmid, "嗨！".$name."。收到訊息：".$message);
+			$msg = $messaging['message']['text'];
+			if ($msg[0] !== "/") {
+				SendMessage($tmid, $M["notcommand"]);
+				continue;
+			}
+			$msg = str_replace("\n", " ", $msg);
+			$msg = preg_replace("/\s+/", " ", $msg);
+			$cmd = explode(" ", $msg);
+			switch ($cmd[0]) {
+				case '/start':
+					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '1' WHERE `tmid` = :tmid");
+					$sth->bindValue(":tmid", $tmid);
+					$res = $sth->execute();
+					$cnt = $sth->rowCount();
+					if ($res && $cnt == 1) {
+						SendMessage($tmid, $M["start"]);
+					} else {
+						WriteLog("start fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
+						SendMessage($tmid, $M["fail"]);
+					}
+					break;
+				
+				case '/stop':
+					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '0' WHERE `tmid` = :tmid");
+					$sth->bindValue(":tmid", $tmid);
+					$res = $sth->execute();
+					$cnt = $sth->rowCount();
+					if ($res && $cnt == 1) {
+						SendMessage($tmid, $M["stop"]);
+					} else {
+						WriteLog("stop fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
+						SendMessage($tmid, $M["fail"]);
+					}
+					break;
+				
+				case '/help':
+					SendMessage($tmid, $M["help"]);
+					break;
+				
+				default:
+					SendMessage($tmid, $M["wrongcommand"]);
+					break;
+			}
 		}
 	}
 }
