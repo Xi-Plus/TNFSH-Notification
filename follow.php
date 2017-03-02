@@ -114,6 +114,39 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 					}
 					break;
 				
+				case '/last':
+					$cnt = 1;
+					if (isset($cmd[1])) {
+						if (is_numeric($cmd[1])) {
+							$cnt = (int)$cmd[1];
+						} else {
+							SendMessage($tmid, $M["/last_wrong_cnt"]);
+							continue;
+						}
+					}
+					if (isset($cmd[2])) {
+						SendMessage($tmid, $M["/last_too_many_arg"]);
+						continue;
+					}
+					$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news` ORDER BY `time` DESC LIMIT {$cnt}");
+					$res = $sth->execute();
+					$row = $sth->fetchAll(PDO::FETCH_ASSOC);
+					if ($res) {
+						if ($row === false) {
+							SendMessage($tmid, $M["/last_no_result"]);
+						} else {
+							$msg = "";
+							foreach ($row as $temp) {
+								$msg .= date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"]."\n\n";
+							}
+							SendMessage($tmid, $msg);
+						}
+					} else {
+						WriteLog("last fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
+						SendMessage($tmid, $M["fail"]);
+					}
+					break;
+				
 				case '/help':
 					SendMessage($tmid, $M["help"]);
 					break;
