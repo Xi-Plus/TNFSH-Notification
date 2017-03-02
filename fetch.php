@@ -6,7 +6,7 @@ if (!in_array(PHP_SAPI, array("cli", "apache2handler"))) {
 }
 define("EOL", (PHP_SAPI==="apache2handler"?"<br>\n":PHP_EOL));
 
-$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}log`");
+$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news`");
 $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
@@ -36,7 +36,7 @@ foreach ($match[0] as $key => $value) {
 			system("curl -s -o /dev/null/ https://archive.is/submit/ -d 'url=".$match[4][$key]."&anyway=1'");
 			echo " archive.is";
 		}
-		$sth = $G["db"]->prepare("INSERT INTO `".$C['DBTBprefix']."log` (`date`, `text`, `department`, `url`, `hash`) VALUES (:date, :text, :department, :url, :hash)");
+		$sth = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}news` (`date`, `text`, `department`, `url`, `hash`) VALUES (:date, :text, :department, :url, :hash)");
 		$sth->bindValue(":date", $match[1][$key]."-".$match[2][$key]."-".$match[3][$key]);
 		$sth->bindValue(":text", $match[5][$key]);
 		$sth->bindValue(":department", $match[6][$key]);
