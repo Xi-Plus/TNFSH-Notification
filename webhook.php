@@ -17,6 +17,6 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 	$sth->bindValue(":hash", $hash);
 	$res = $sth->execute();
 	WriteLog("got: ".$inputJSON);
-	pclose(popen("php follow.php", "r"));
+	exec("php follow.php > /dev/null 2>&1 &");
 }
 WriteLog("webhook takes ".(microtime(true)-$start)." seconds");
