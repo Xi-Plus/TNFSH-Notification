@@ -3,6 +3,7 @@ date_default_timezone_set("Asia/Taipei");
 require(__DIR__.'/config/config.php');
 require(__DIR__.'/curl.php');
 require(__DIR__.'/log.php');
+require(__DIR__.'/sendmessage.php');
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}input` ORDER BY `time` ASC");
 $res = $sth->execute();
@@ -11,19 +12,6 @@ foreach ($row as $data) {
 	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}input` WHERE `hash` = :hash");
 	$sth->bindValue(":hash", $data["hash"]);
 	$res = $sth->execute();
-}
-function SendMessage($tmid, $message) {
-	global $C;
-	$post = array(
-		"message" => $message,
-		"access_token" => $C['FBpagetoken']
-	);
-	$res = cURL($C['FBAPI'].$tmid."/messages", $post);
-	WriteLog("send message: tmid=".$tmid." message=".$message);
-	$res = json_decode($res, true);
-	if (isset($res["error"])) {
-		WriteLog("send message error: tmid=".$tmid." res=".json_encode($res));
-	}
 }
 function GetTmid() {
 	global $C, $G;
