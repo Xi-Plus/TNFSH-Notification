@@ -7,6 +7,11 @@ require(__DIR__.'/log.php');
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}input` ORDER BY `time` ASC");
 $res = $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
+foreach ($row as $data) {
+	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}input` WHERE `hash` = :hash");
+	$sth->bindValue(":hash", $data["hash"]);
+	$res = $sth->execute();
+}
 function SendMessage($tmid, $message) {
 	global $C;
 	$post = array(
@@ -209,7 +214,4 @@ foreach ($row as $data) {
 			}
 		}
 	}
-	$sth = $G["db"]->prepare("DELETE FROM `{$C['DBTBprefix']}input` WHERE `hash` = :hash");
-	$sth->bindValue(":hash", $data["hash"]);
-	$res = $sth->execute();
 }
