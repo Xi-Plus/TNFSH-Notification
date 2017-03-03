@@ -1,5 +1,6 @@
 <?php
 require(__DIR__.'/config/config.php');
+require(__DIR__.'/log.php');
 
 if (!in_array(PHP_SAPI, array("cli", "apache2handler"))) {
 	exit("No permission");
@@ -33,8 +34,9 @@ curl_close($ch);
 
 $res = json_decode($res, true);
 if (isset($res["error"])) {
-	var_dump($res["error"]);
+	WriteLog("post fail: res=".json_encode($res));
 } else {
+	WriteLog("post success");
 	$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}news` SET `fbpost` = '1' WHERE `hash` = :hash");
 	foreach ($row as $temp) {
 		$sth->bindValue(":hash", $temp["hash"]);

@@ -1,4 +1,5 @@
 <?php
+$start = microtime(true);
 date_default_timezone_set("Asia/Taipei");
 require(__DIR__.'/config/config.php');
 require(__DIR__.'/log.php');
@@ -18,3 +19,4 @@ if ($method == 'GET' && $_GET['hub_mode'] == 'subscribe' &&  $_GET['hub_verify_t
 	WriteLog("got: ".$inputJSON);
 	pclose(popen("php follow.php", "r"));
 }
+WriteLog("webhook takes ".(microtime(true)-$start)." seconds");
