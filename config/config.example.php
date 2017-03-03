@@ -18,7 +18,7 @@ $C['fetch'] = 'http://www.tnfsh.tn.edu.tw/files/501-1000-1012-1.php';
 
 $G["db"] = new PDO ('mysql:host='.$C["DBhost"].';dbname='.$C["DBname"].';charset=utf8', $C["DBuser"], $C["DBpass"]);
 
-$C['/last_limit'] = 20;
+$C['/last_limit'] = 5;
 
 $M["nottext"] = "僅接受文字訊息";
 $M["notcommand"] = "本粉專由機器人自動運作\n".
