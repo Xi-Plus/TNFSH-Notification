@@ -20,7 +20,7 @@ function SendMessage($tmid, $message) {
 	);
 	$res = cURL($C['FBAPI'].$tmid."/messages", $post);
 	WriteLog("send message: tmid=".$tmid." message=".$message);
-	$res = json_encode($res, true);
+	$res = json_decode($res, true);
 	if (isset($res["error"])) {
 		WriteLog("send message error: tmid=".$tmid." res=".json_encode($res));
 	}
