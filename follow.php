@@ -180,7 +180,7 @@ foreach ($row as $data) {
 							}
 							$idx = $a + $b;
 							foreach (array_reverse($row) as $temp) {
-								$msg = "#".$idx."\n".date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"]."\n".$temp["url"];
+								$msg = "#".$idx."\n".date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"];
 								SendMessage($tmid, $msg);
 								$idx --;
 							}
