@@ -256,7 +256,7 @@ foreach ($row as $data) {
 					break;
 				
 				case '/help':
-					SendMessage($tmid, $M["help"]);
+					SendMessage($tmid, $M["/help"]);
 					break;
 				
 				default:
