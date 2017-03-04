@@ -28,6 +28,7 @@ CREATE TABLE `tnfsh_notification_msgqueue` (
 
 CREATE TABLE `tnfsh_notification_news` (
   `date` date NOT NULL,
+  `idx` int(11) NOT NULL,
   `text` text NOT NULL,
   `department` varchar(10) NOT NULL,
   `url` varchar(255) NOT NULL,
