@@ -178,11 +178,9 @@ foreach ($row as $data) {
 							} else {
 								SendMessage($tmid, "忽略最後".$a."筆，顯示".$b."筆訊息");
 							}
-							$idx = $a + $b;
 							foreach (array_reverse($row) as $temp) {
-								$msg = "#".$idx."\n".date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"];
+								$msg = "#".$temp["idx"]."\n".date("m/d", strtotime($temp["date"]))." ".$temp["department"]."：".$temp["text"];
 								SendMessage($tmid, $msg);
-								$idx --;
 							}
 							SendMessage($tmid, "顯示更舊".$b."筆輸入 /last ".($a+$b)." ".$b);
 						}
