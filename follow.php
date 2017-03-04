@@ -20,7 +20,7 @@ function GetTmid() {
 	$newesttime = $updated_time;
 	while (true) {
 		if ($res === false) {
-			WriteLog("fetch uid: curl fail");
+			WriteLog("[follow][error][getuid]");
 			break;
 		}
 		$res = json_decode($res, true);
@@ -63,15 +63,14 @@ foreach ($row as $data) {
 			$sth->execute();
 			$row = $sth->fetch(PDO::FETCH_ASSOC);
 			if ($row === false) {
-				WriteLog("get uid ".$uid);
 				GetTmid();
 				$sth->execute();
 				$row = $sth->fetch(PDO::FETCH_ASSOC);
 				if ($row === false) {
-					WriteLog("uid not found uid=".$uid." res=".json_encode($messaging));
+					WriteLog("[follow][error][uid404] uid=".$uid);
 					continue;
 				} else {
-					WriteLog("new user: uid=".$uid);
+					WriteLog("[follow][info][newuser] uid=".$uid);
 				}
 			}
 			$tmid = $row["tmid"];
@@ -99,7 +98,7 @@ foreach ($row as $data) {
 					if ($res) {
 						SendMessage($tmid, $M["/start"]);
 					} else {
-						WriteLog("start fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
+						WriteLog("[follow][error][start][upduse] uid=".$uid);
 						SendMessage($tmid, $M["fail"]);
 					}
 					break;
@@ -115,7 +114,7 @@ foreach ($row as $data) {
 					if ($res) {
 						SendMessage($tmid, $M["/stop"]);
 					} else {
-						WriteLog("stop fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
+						WriteLog("[follow][error][stop][upduse] uid=".$uid);
 						SendMessage($tmid, $M["fail"]);
 					}
 					break;
@@ -185,7 +184,7 @@ foreach ($row as $data) {
 							SendMessage($tmid, "顯示更舊".$b."筆輸入 /last ".($a+$b)." ".$b);
 						}
 					} else {
-						WriteLog("last fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
+						WriteLog("[follow][error][last][selnew] uid=".$uid);
 						SendMessage($tmid, $M["fail"]);
 					}
 					break;
@@ -216,7 +215,7 @@ foreach ($row as $data) {
 							SendMessage($tmid, $msg);
 						}
 					} else {
-						WriteLog("link fail: uid=".$uid." res=".json_encode($res)." idx=".$idx);
+						WriteLog("[follow][error][start][selnew] uid=".$uid);
 						SendMessage($tmid, $M["fail"]);
 					}
 					break;
@@ -250,7 +249,7 @@ foreach ($row as $data) {
 							SendMessage($tmid, $msg);
 						}
 					} else {
-						WriteLog("link fail: uid=".$uid." res=".json_encode($res)." idx=".$idx);
+						WriteLog("[follow][error][start][selnew] uid=".$uid);
 						SendMessage($tmid, $M["fail"]);
 					}
 					break;

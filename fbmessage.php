@@ -28,13 +28,13 @@ foreach ($newss as $news) {
 		$sthmsg->bindValue(":hash", $hash);
 		$res = $sthmsg->execute();
 		if ($res === false) {
-			WriteLog("prepare msg fail: tmid=".$user["tmid"]." msg=".$msg);
+			WriteLog("[fbmsg][error][insque] tmid=".$user["tmid"]." msg=".$msg);
 		}
 	}
 	$sthok->bindValue(":hash", $news["hash"]);
 	$res = $sthok->execute();
 	if ($res === false) {
-		WriteLog("check msg end fail: hash=".$news["hash"]);
+		WriteLog("[fbmsg][error][updnew] hash=".$news["hash"]);
 	}
 }
 
@@ -48,7 +48,7 @@ foreach ($row as $msg) {
 		$sth->bindValue(":hash", $msg["hash"]);
 		$res = $sth->execute();
 		if ($res === false) {
-			WriteLog("delete msg queue error: hash=".$msg["hash"]);
+			WriteLog("[fbmsg][error][delque] hash=".$msg["hash"]);
 		}
 	}
 }

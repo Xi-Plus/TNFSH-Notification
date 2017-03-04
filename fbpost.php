@@ -34,9 +34,9 @@ curl_close($ch);
 
 $res = json_decode($res, true);
 if (isset($res["error"])) {
-	WriteLog("post fail: res=".json_encode($res));
+	WriteLog("[fbpos][error] res=".json_encode($res));
 } else {
-	WriteLog("post success");
+	WriteLog("[fbpos][info] success");
 	$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}news` SET `fbpost` = '1' WHERE `hash` = :hash");
 	foreach ($row as $temp) {
 		$sth->bindValue(":hash", $temp["hash"]);
