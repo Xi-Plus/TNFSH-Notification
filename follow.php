@@ -90,14 +90,14 @@ foreach ($row as $data) {
 			switch ($cmd[0]) {
 				case '/start':
 					if (isset($cmd[1])) {
-						SendMessage($tmid, $M["start_too_many_arg"]);
+						SendMessage($tmid, $M["/start_too_many_arg"]);
 						continue;
 					}
 					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '1' WHERE `tmid` = :tmid");
 					$sth->bindValue(":tmid", $tmid);
 					$res = $sth->execute();
 					if ($res) {
-						SendMessage($tmid, $M["start"]);
+						SendMessage($tmid, $M["/start"]);
 					} else {
 						WriteLog("start fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
 						SendMessage($tmid, $M["fail"]);
@@ -106,14 +106,14 @@ foreach ($row as $data) {
 				
 				case '/stop':
 					if (isset($cmd[1])) {
-						SendMessage($tmid, $M["stop_too_many_arg"]);
+						SendMessage($tmid, $M["/stop_too_many_arg"]);
 						continue;
 					}
 					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '0' WHERE `tmid` = :tmid");
 					$sth->bindValue(":tmid", $tmid);
 					$res = $sth->execute();
 					if ($res) {
-						SendMessage($tmid, $M["stop"]);
+						SendMessage($tmid, $M["/stop"]);
 					} else {
 						WriteLog("stop fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
 						SendMessage($tmid, $M["fail"]);
@@ -125,7 +125,7 @@ foreach ($row as $data) {
 					$b = 1;
 					if (isset($cmd[1]) && !isset($cmd[2])) {
 						if (!ctype_digit($cmd[1])) {
-							SendMessage($tmid, $M["/last1_arg1_notnum"]);
+							SendMessage($tmid, $M["/last1_arg1_not_num"]);
 							continue;
 						}
 						$b = (int)$cmd[1];
@@ -140,11 +140,11 @@ foreach ($row as $data) {
 					}
 					if (isset($cmd[2])) {
 						if (!ctype_digit($cmd[1])) {
-							SendMessage($tmid, $M["/last2_arg1_notnum"]);
+							SendMessage($tmid, $M["/last2_arg1_not_num"]);
 							continue;
 						}
 						if (!ctype_digit($cmd[2])) {
-							SendMessage($tmid, $M["/last_arg2_notnum"]);
+							SendMessage($tmid, $M["/last_arg2_not_num"]);
 							continue;
 						}
 						$a = (int)$cmd[1];
@@ -186,6 +186,71 @@ foreach ($row as $data) {
 						}
 					} else {
 						WriteLog("last fail: uid=".$uid." res=".json_encode($res)." cnt=".$cnt);
+						SendMessage($tmid, $M["fail"]);
+					}
+					break;
+
+				case '/link':
+					if (!isset($cmd[1])) {
+						SendMessage($tmid, $M["/link_arg1_not_given"]);
+						continue;
+					}
+					if (isset($cmd[2])) {
+						SendMessage($tmid, $M["/link_too_many_arg"]);
+						continue;
+					}
+					if (!ctype_digit($cmd[1])) {
+						SendMessage($tmid, $M["/link_arg1_not_num"]);
+						continue;
+					}
+					$idx = (int)$cmd[1];
+					$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news` WHERE `idx` = :idx");
+					$sth->bindValue(":idx", $idx);
+					$res = $sth->execute();
+					$news = $sth->fetch(PDO::FETCH_ASSOC);
+					if ($res) {
+						if ($news === false) {
+							SendMessage($tmid, $M["/link_not_found"]);
+						} else {
+							$msg = "#".$idx."\n".$news["url"];
+							SendMessage($tmid, $msg);
+						}
+					} else {
+						WriteLog("link fail: uid=".$uid." res=".json_encode($res)." idx=".$idx);
+						SendMessage($tmid, $M["fail"]);
+					}
+					break;
+				
+
+				case '/archive':
+					if (!isset($cmd[1])) {
+						SendMessage($tmid, $M["/archive_arg1_not_given"]);
+						continue;
+					}
+					if (isset($cmd[2])) {
+						SendMessage($tmid, $M["/archive_too_many_arg"]);
+						continue;
+					}
+					if (!ctype_digit($cmd[1])) {
+						SendMessage($tmid, $M["/archive_arg1_not_num"]);
+						continue;
+					}
+					$idx = (int)$cmd[1];
+					$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news` WHERE `idx` = :idx");
+					$sth->bindValue(":idx", $idx);
+					$res = $sth->execute();
+					$news = $sth->fetch(PDO::FETCH_ASSOC);
+					if ($res) {
+						if ($news === false) {
+							SendMessage($tmid, $M["/archive_not_found"]);
+						} else {
+							$msg = "#".$idx."\n".
+								"http://web.archive.org/web/*/".$news["url"]."\n\n".
+								"http://archive.is/search/?q=".urlencode($news["url"]);
+							SendMessage($tmid, $msg);
+						}
+					} else {
+						WriteLog("link fail: uid=".$uid." res=".json_encode($res)." idx=".$idx);
 						SendMessage($tmid, $M["fail"]);
 					}
 					break;
