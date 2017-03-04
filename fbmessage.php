@@ -19,7 +19,7 @@ $users = $sth->fetchAll(PDO::FETCH_ASSOC);
 $sthmsg = $G["db"]->prepare("INSERT INTO `{$C['DBTBprefix']}msgqueue` (`tmid`, `message`, `time`, `hash`) VALUES (:tmid, :message, :time, :hash)");
 $sthok = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}news` SET `fbmessage` = '1' WHERE `hash` = :hash");
 foreach ($newss as $news) {
-	$msg = date("m/d", strtotime($news["date"]))." ".$news["department"]."：".$news["text"];
+	$msg = "#".$news["idx"]."\n".date("m/d", strtotime($news["date"]))." ".$news["department"]."：".$news["text"];
 	foreach ($users as $user) {
 		$hash = md5(json_encode(array("tmid"=>$user["tmid"], "message"=>$msg, "time"=>$news["time"])));
 		$sthmsg->bindValue(":tmid", $user["tmid"]);
