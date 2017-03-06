@@ -11,7 +11,7 @@ $sth->execute();
 $row = $sth->fetchAll(PDO::FETCH_ASSOC);
 
 if (count($row) == 0) {
-	exit("No new".EOL);
+	exit("No new\n");
 }
 
 $message="";

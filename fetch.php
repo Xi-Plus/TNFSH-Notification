@@ -53,9 +53,9 @@ for ($key=count($match[0])-1; $key >= 0; $key--) {
 		$sth->execute();
 
 		$old[] = $hash;
-		echo " New".EOL;
+		echo " New\n";
 		$new_cnt++;
-	} else echo " Old".EOL;
+	} else echo " Old\n";
 }
 file_put_contents("next_id.txt", $oldid);
 if ($new_cnt) {
@@ -68,6 +68,6 @@ if ($new_cnt) {
 		system("curl -s https://archive.is/submit/ -d 'url=".$C['fetch']."&anyway=1' > /dev/null 2>&1 &");
 		echo " archive.is";
 	}
-	echo " done".EOL;
+	echo " done\n";
 }
 ?>
