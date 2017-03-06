@@ -1,10 +1,8 @@
 <?php
 require(__DIR__.'/config/config.php');
-
-if (!in_array(PHP_SAPI, array("cli", "apache2handler"))) {
+if (!in_array(PHP_SAPI, $C["allowsapi"])) {
 	exit("No permission");
 }
-define("EOL", (PHP_SAPI==="apache2handler"?"<br>\n":PHP_EOL));
 
 $sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news`");
 $sth->execute();

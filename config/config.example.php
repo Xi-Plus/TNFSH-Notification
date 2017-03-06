@@ -16,6 +16,8 @@ $C['DBTBprefix'] = 'tnfsh_notification_';
 
 $C['fetch'] = 'http://www.tnfsh.tn.edu.tw/files/501-1000-1012-1.php';
 
+$C["allowsapi"] = array("cli");
+
 $G["db"] = new PDO ('mysql:host='.$C["DBhost"].';dbname='.$C["DBname"].';charset=utf8', $C["DBuser"], $C["DBpass"]);
 
 $C['/last_limit'] = 5;
