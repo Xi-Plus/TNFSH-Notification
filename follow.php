@@ -20,7 +20,7 @@ foreach ($row as $data) {
 function GetTmid() {
 	global $C, $G;
 	$res = cURL($C['FBAPI']."me/conversations?fields=participants,updated_time&access_token=".$C['FBpagetoken']);
-	$updated_time = file_get_contents("updated_time.txt");
+	$updated_time = file_get_contents("data/updated_time.txt");
 	$newesttime = $updated_time;
 	while (true) {
 		if ($res === false) {
@@ -51,7 +51,7 @@ function GetTmid() {
 		}
 		$res = cURL($res["paging"]["next"]);
 	}
-	file_put_contents("updated_time.txt", $newesttime);
+	file_put_contents("data/updated_time.txt", $newesttime);
 }
 foreach ($row as $data) {
 	$input = json_decode($data["input"], true);
@@ -194,36 +194,72 @@ foreach ($row as $data) {
 					break;
 
 				case '/link':
-					if (!isset($cmd[1])) {
-						SendMessage($tmid, $M["/link_arg1_not_given"]);
-						continue;
-					}
-					if (isset($cmd[2])) {
-						SendMessage($tmid, $M["/link_too_many_arg"]);
-						continue;
-					}
-					if (!ctype_digit($cmd[1])) {
-						SendMessage($tmid, $M["/link_arg1_not_num"]);
-						continue;
-					}
-					$idx = (int)$cmd[1];
-					$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news` WHERE `idx` = :idx");
-					$sth->bindValue(":idx", $idx);
-					$res = $sth->execute();
-					$news = $sth->fetch(PDO::FETCH_ASSOC);
-					if ($res) {
-						if ($news === false) {
-							SendMessage($tmid, $M["/link_not_found"]);
-						} else {
-							$msg = "#".$idx."\n".$news["url"];
-							SendMessage($tmid, $msg);
+					if (isset($cmd[1])) {
+						if (preg_match("/^-?\d+$/", $cmd[1]) == 0) {
+							SendMessage($tmid, $M["/link_arg1_error"]);
+							continue;
+						}
+						$n = (int)$cmd[1];
+						if ($n == 0) {
+							SendMessage($tmid, $M["/link_arg1_error"]);
+							continue;
+						}
+						if (isset($cmd[2])) {
+							SendMessage($tmid, $M["/link_too_many_arg"]);
+							continue;
 						}
 					} else {
-						WriteLog("[follow][error][start][selnew] uid=".$uid);
-						SendMessage($tmid, $M["fail"]);
+						$n = -1;
+					}
+					if ($n >= 0) {
+						$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news` WHERE `idx` = :idx");
+						$sth->bindValue(":idx", $n);
+						$res = $sth->execute();
+						$news = $sth->fetch(PDO::FETCH_ASSOC);
+						if ($res) {
+							if ($news === false) {
+								SendMessage($tmid, $M["/link_not_found"]);
+							} else {
+								$msg = "#".$n."\n".$news["url"];
+								SendMessage($tmid, $msg);
+							}
+						} else {
+							WriteLog("[follow][error][start][selnew] uid=".$uid);
+							SendMessage($tmid, $M["fail"]);
+						}
+					} else {
+						$n = -$n;
+						if ($n <= $C['/link_limit']) {
+							$a = 0;
+							$b = $n;
+						} else {
+							$a = $n - $C['/link_limit'];
+							$b = $C['/link_limit'];
+						}
+						$sth = $G["db"]->prepare("SELECT * FROM `{$C['DBTBprefix']}news` ORDER BY `time` DESC LIMIT {$a},{$b}");
+						$res = $sth->execute();
+						$row = $sth->fetchAll(PDO::FETCH_ASSOC);
+						if ($res) {
+							if (count($row) == 0) {
+								SendMessage($tmid, $M["/link_no_result"]);
+							} else {
+								if ($a == 0) {
+									SendMessage($tmid, "顯示最後".$b."筆通知的連結");
+								} else {
+									SendMessage($tmid, "忽略最後".$a."筆，顯示".$b."筆通知的連結");
+								}
+								foreach (array_reverse($row) as $temp) {
+									$msg = "#".$temp["idx"]."\n".$temp["url"];
+									SendMessage($tmid, $msg);
+								}
+								SendMessage($tmid, "顯示更舊".$C['/link_limit']."筆輸入 /link -".($a+$b+$C['/link_limit']));
+							}
+						} else {
+							WriteLog("[follow][error][link][selnew] uid=".$uid);
+							SendMessage($tmid, $M["fail"]);
+						}
 					}
 					break;
-				
 
 				case '/archive':
 					if (!isset($cmd[1])) {
