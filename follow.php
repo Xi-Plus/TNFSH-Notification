@@ -97,7 +97,7 @@ foreach ($row as $data) {
 				case '/start':
 					if (isset($cmd[1])) {
 						SendMessage($tmid, "參數個數錯誤\n".
-							"此指令不需要參數");
+							"此命令不需要參數");
 						continue;
 					}
 					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '1' WHERE `tmid` = :tmid");
@@ -108,14 +108,14 @@ foreach ($row as $data) {
 							"欲取消請輸入 /stop");
 					} else {
 						WriteLog("[follow][error][start][upduse] uid=".$uid);
-						SendMessage($tmid, "指令失敗");
+						SendMessage($tmid, "命令失敗");
 					}
 					break;
 				
 				case '/stop':
 					if (isset($cmd[1])) {
 						SendMessage($tmid, "參數個數錯誤\n".
-							"此指令不需要參數");
+							"此命令不需要參數");
 						continue;
 					}
 					$sth = $G["db"]->prepare("UPDATE `{$C['DBTBprefix']}user` SET `fbmessage` = '0' WHERE `tmid` = :tmid");
@@ -126,7 +126,7 @@ foreach ($row as $data) {
 							"欲重新啟用請輸入 /start");
 					} else {
 						WriteLog("[follow][error][stop][upduse] uid=".$uid);
-						SendMessage($tmid, "指令失敗");
+						SendMessage($tmid, "命令失敗");
 					}
 					break;
 				
@@ -207,7 +207,7 @@ foreach ($row as $data) {
 						}
 					} else {
 						WriteLog("[follow][error][last][selnew] uid=".$uid);
-						SendMessage($tmid, "指令失敗");
+						SendMessage($tmid, "命令失敗");
 					}
 					break;
 
@@ -226,7 +226,7 @@ foreach ($row as $data) {
 						}
 						if (isset($cmd[2])) {
 							SendMessage($tmid, "參數個數錯誤\n".
-								"此指令必須給出一個參數為通知的編號");
+								"此命令必須給出一個參數為通知的編號");
 							continue;
 						}
 					} else {
@@ -246,7 +246,7 @@ foreach ($row as $data) {
 							}
 						} else {
 							WriteLog("[follow][error][start][selnew] uid=".$uid);
-							SendMessage($tmid, "指令失敗");
+							SendMessage($tmid, "命令失敗");
 						}
 					} else {
 						$n = -$n;
@@ -277,7 +277,7 @@ foreach ($row as $data) {
 							}
 						} else {
 							WriteLog("[follow][error][link][selnew] uid=".$uid);
-							SendMessage($tmid, "指令失敗");
+							SendMessage($tmid, "命令失敗");
 						}
 					}
 					break;
@@ -285,12 +285,12 @@ foreach ($row as $data) {
 				case '/archive':
 					if (!isset($cmd[1])) {
 						SendMessage($tmid, "參數不足\n".
-							"此指令必須給出一個參數為通知的編號");
+							"此命令必須給出一個參數為通知的編號");
 						continue;
 					}
 					if (isset($cmd[2])) {
 						SendMessage($tmid, "參數個數錯誤\n".
-							"此指令必須給出一個參數為通知的編號");
+							"此命令必須給出一個參數為通知的編號");
 						continue;
 					}
 					if (!ctype_digit($cmd[1])) {
@@ -325,22 +325,61 @@ foreach ($row as $data) {
 						}
 					} else {
 						WriteLog("[follow][error][start][selnew] uid=".$uid);
-						SendMessage($tmid, "指令失敗");
+						SendMessage($tmid, "命令失敗");
 					}
 					break;
 				
 				case '/help':
-					SendMessage($tmid, "可用命令\n".
+					if (isset($cmd[2])) {
+						$msg = "參數過多\n".
+							"必須給出一個參數為命令的名稱";
+					} else if (isset($cmd[1])) {
+						switch ($cmd[1]) {
+							case 'start':
+								$msg = "/start 啟用訊息通知";
+								break;
+							
+							case 'stop':
+								$msg = "/start 停用訊息通知";
+								break;
+							
+							case 'last':
+								$msg = "/last 顯示最後一筆通知\n".
+									"/last [count] 顯示最後[count]筆通知\n".
+									"/last [offset] [count] 略過最後[offset]筆，顯示[count]筆通知\n".
+									"([count]至多".$C['/last_limit'].")";
+								break;
+							
+							case 'link':
+								$msg = "/link 顯示最後一筆通知的連結\n".
+									 "/link [id] 顯示編號[id]的連結\n".
+									 "/link -[count] 顯示指定數量的連結\n".
+									 "    若[count]>".$C['/link_limit']."僅會顯示[count]起算".$C['/link_limit']."筆";
+								break;
+							
+							case 'archive':
+								$msg = "/archive [id] 顯示編號[id]的存檔連結";
+								break;
+							
+							case 'help':
+								$msg = "/help 顯示所有命令";
+								break;
+							
+							default:
+								$msg = "查無此命令";
+								break;
+						}
+					} else {
+						$msg = "可用命令\n".
 						"/start 啟用訊息通知\n".
 						"/stop 停用訊息通知\n".
-						"/last 顯示最後一筆通知\n".
-						"/last N 顯示最後N筆通知 (N至多".$C['/last_limit'].")\n".
-						"/last A B 略過最後A筆，顯示B筆通知 (B至多".$C['/last_limit'].")\n".
-						"/link N 顯示編號N的原始連結\n".
-						"/link 顯示最後1筆的原始連結\n".
-						"/link -N 顯示最後N筆的原始連結，若N>".$C['/link_limit']."僅會顯示N起算".$C['/link_limit']."筆\n".
-						"/archive N 顯示編號N的存檔連結\n".
-						"/help 顯示所有命令");
+						"/last 顯示舊通知\n".
+						"/link 顯示通知的連結\n".
+						"/archive 顯示通知的存檔連結\n".
+						"/help 顯示所有命令\n\n".
+						"/help [命令] 顯示命令的詳細用法";
+					}
+					SendMessage($tmid, $msg);
 					break;
 				
 				default:
