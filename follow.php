@@ -347,18 +347,28 @@ foreach ($row as $data) {
 								$msg = "/last 顯示最後一筆通知\n".
 									"/last [count] 顯示最後[count]筆通知\n".
 									"/last [offset] [count] 略過最後[offset]筆，顯示[count]筆通知\n".
-									"([count]至多".$C['/last_limit'].")";
+									"([count]至多".$C['/last_limit'].")\n\n".
+									"範例：\n".
+									"/last 3 顯示最後3筆\n".
+									"/last 5 3 顯示最後6~8筆";
 								break;
 							
 							case 'link':
 								$msg = "/link 顯示最後一筆通知的連結\n".
 									 "/link [id] 顯示編號[id]的連結\n".
-									 "/link -[count] 顯示指定數量的連結\n".
-									 "    若[count]>".$C['/link_limit']."僅會顯示[count]起算".$C['/link_limit']."筆";
+									 "/link -[count] 顯示最後[count]筆的連結\n".
+									 "    若[count]>".$C['/link_limit']."僅會顯示[count]起算".$C['/link_limit']."筆\n\n".
+									"範例：\n".
+									"/link 顯示最後一筆\n".
+									"/link 12345 顯示編號12345\n".
+									"/link -3 顯示最後3筆\n".
+									"/link -8 顯示最後6~8筆";
 								break;
 							
 							case 'archive':
-								$msg = "/archive [id] 顯示編號[id]的存檔連結";
+								$msg = "/archive [id] 顯示編號[id]的存檔連結\n\n".
+									"範例：\n".
+									"/link 12345 顯示編號12345";
 								break;
 							
 							case 'help':
@@ -377,7 +387,8 @@ foreach ($row as $data) {
 						"/link 顯示通知的連結\n".
 						"/archive 顯示通知的存檔連結\n".
 						"/help 顯示所有命令\n\n".
-						"/help [命令] 顯示命令的詳細用法";
+						"/help [命令] 顯示命令的詳細用法\n".
+						"範例： /help link";
 					}
 					SendMessage($tmid, $msg);
 					break;
