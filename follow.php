@@ -340,7 +340,7 @@ foreach ($row as $data) {
 								break;
 							
 							case 'stop':
-								$msg = "/start 停用訊息通知";
+								$msg = "/stop 停用訊息通知";
 								break;
 							
 							case 'last':
@@ -368,7 +368,7 @@ foreach ($row as $data) {
 							case 'archive':
 								$msg = "/archive [id] 顯示編號[id]的存檔連結\n\n".
 									"範例：\n".
-									"/link 12345 顯示編號12345";
+									"/archive 12345 顯示編號12345";
 								break;
 							
 							case 'help':
