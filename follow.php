@@ -364,7 +364,7 @@ foreach ($row as $data) {
 									$news["url"]);
 								continue;
 							}
-							if (preg_match("/<div class=\"ptcontent\">((?:.|\n)+?)<div class=\"md_bottom\">/", $content, $m)) {
+							if (preg_match("/<div class=\"ptcontent.*?\">((?:.|\n)+?)<div class=\"md_bottom\">/", $content, $m)) {
 								$content = $m[1];
 								$content = html_entity_decode($content);
 								$content = strip_tags($content);
