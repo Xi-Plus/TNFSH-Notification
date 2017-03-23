@@ -364,22 +364,31 @@ foreach ($row as $data) {
 									$news["url"]);
 								continue;
 							}
-							if (preg_match("/<div class=\"ptcontent.*?\">((?:.|\n)+?)<div class=\"md_bottom\">/", $content, $m)) {
-								$content = $m[1];
-								$content = html_entity_decode($content);
-								$content = strip_tags($content);
-								$content = preg_replace("/\n\n+/", "\n", $content);
-								$content = preg_replace("/^\n+/", "", $content);
-								$content = preg_replace("/\n+$/", "", $content);
-								SendMessage($tmid, "#".$news["idx"]."\n".
-									date("m/d", strtotime($news["date"]))." ".$news["department"]."：".$news["text"]."\n".
-									"----------------------------------------\n".
-									$content);
-							} else {
+							$p = strpos($content, '<div class="ptcontent');
+							if ($p === false) {
 								SendMessage($tmid, "解析網頁失敗，此問題修復後將會收到通知\n".
 									"請直接自行點選連結查看\n".
 									$news["url"]);
+								continue;
 							}
+							$content = substr($content, $p);
+							$p = strpos($content, '<div class="md_bottom">');
+							if ($p === false) {
+								SendMessage($tmid, "解析網頁失敗，此問題修復後將會收到通知\n".
+									"請直接自行點選連結查看\n".
+									$news["url"]);
+								continue;
+							}
+							$content = substr($content, 0, $p);
+							$content = html_entity_decode($content);
+							$content = strip_tags($content);
+							$content = preg_replace("/\n\n+/", "\n", $content);
+							$content = preg_replace("/^\n+/", "", $content);
+							$content = preg_replace("/\n+$/", "", $content);
+							SendMessage($tmid, "#".$news["idx"]."\n".
+								date("m/d", strtotime($news["date"]))." ".$news["department"]."：".$news["text"]."\n".
+								"----------------------------------------\n".
+								$content);
 						} else {
 							SendMessage($tmid, "連結不是校方網站，因此無法預覽\n".
 								"請直接自行點選連結查看\n".
