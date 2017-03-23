@@ -359,7 +359,7 @@ foreach ($row as $data) {
 						} else if (preg_match("/http:\/\/.+?.tnfsh.tn.edu.tw\/files\/\d+?-\d+?-\d+?-\d+?.php/", $news["url"])) {
 							$content = file_get_contents($news["url"]);
 							if ($content === false) {
-								SendMessage($tmid, "抓取網頁失敗\n".
+								SendMessage($tmid, "抓取網頁失敗，請稍後再試一次\n".
 									"請直接自行點選連結查看\n".
 									$news["url"]);
 								continue;
@@ -376,7 +376,7 @@ foreach ($row as $data) {
 									"----------------------------------------\n".
 									$content);
 							} else {
-								SendMessage($tmid, "解析網頁失敗\n".
+								SendMessage($tmid, "解析網頁失敗，此問題修復後將會收到通知\n".
 									"請直接自行點選連結查看\n".
 									$news["url"]);
 							}
