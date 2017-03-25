@@ -14,6 +14,9 @@ $C['DBuser'] = 'user';
 $C['DBpass'] = 'pass';
 $C['DBTBprefix'] = 'tnfsh_notification_';
 
+$C['UnreadLimit'] = 86400*7;
+$C['UnreadLimitText'] = "7天";
+
 $C['fetch'] = 'http://www.tnfsh.tn.edu.tw/files/501-1000-1012-1.php';
 
 $C["allowsapi"] = array("cli");
