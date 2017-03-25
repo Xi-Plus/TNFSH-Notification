@@ -41,6 +41,7 @@ CREATE TABLE `tnfsh_notification_news` (
 CREATE TABLE `tnfsh_notification_user` (
   `uid` varchar(255) NOT NULL,
   `tmid` varchar(255) NOT NULL,
+  `sid` varchar(255) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL,
   `fbmessage` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
