@@ -357,6 +357,11 @@ foreach ($row as $data) {
 							$content = substr($content, 0, $p);
 							$content = html_entity_decode($content);
 							$content = strip_tags($content);
+							$content = str_replace("\r", "", $content);
+							$content = str_replace("\xC2\xA0", " ", $content);
+							$content = preg_replace("/\s\s+/", " ", $content);
+							$content = preg_replace("/^ $/m", "", $content);
+							$content = preg_replace("/^ +/m", "", $content);
 							$content = preg_replace("/\n\n+/", "\n", $content);
 							$content = preg_replace("/^\n+/", "", $content);
 							$content = preg_replace("/\n+$/", "", $content);
