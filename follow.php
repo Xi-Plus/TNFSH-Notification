@@ -335,21 +335,24 @@ foreach ($row as $data) {
 						if ($news === false) {
 							SendMessage($tmid, "找不到此編號");
 						} else if (preg_match("/http:\/\/.+?.tnfsh.tn.edu.tw\/files\/\d+?-\d+?-\d+?-\d+?.php/", $news["url"])) {
-							$content = file_get_contents($news["url"]);
-							if ($content === false) {
+							$msg = "#".$news["idx"]."\n".
+								date("m/d", strtotime($news["date"]))." ".$news["department"]."：".$news["text"]."\n";
+							$html = file_get_contents($news["url"]);
+							if ($html === false) {
 								SendMessage($tmid, "抓取網頁失敗，請稍後再試一次\n".
 									"請直接自行點選連結查看\n".
 									$news["url"]);
 								continue;
 							}
-							$p = strpos($content, '<div class="ptcontent');
+
+							$p = strpos($html, '<div class="ptcontent');
 							if ($p === false) {
 								SendMessage($tmid, "解析網頁失敗，此問題修復後將會收到通知\n".
 									"請直接自行點選連結查看\n".
 									$news["url"]);
 								continue;
 							}
-							$content = substr($content, $p);
+							$content = substr($html, $p);
 							$p = strpos($content, '<div class="md_bottom">');
 							if ($p === false) {
 								SendMessage($tmid, "解析網頁失敗，此問題修復後將會收到通知\n".
@@ -357,6 +360,7 @@ foreach ($row as $data) {
 									$news["url"]);
 								continue;
 							}
+
 							$content = substr($content, 0, $p);
 							$content = html_entity_decode($content);
 							$content = strip_tags($content);
@@ -368,10 +372,23 @@ foreach ($row as $data) {
 							$content = preg_replace("/\n\n+/", "\n", $content);
 							$content = preg_replace("/^\n+/", "", $content);
 							$content = preg_replace("/\n+$/", "", $content);
-							SendMessage($tmid, "#".$news["idx"]."\n".
-								date("m/d", strtotime($news["date"]))." ".$news["department"]."：".$news["text"]."\n".
-								"----------------------------------------\n".
-								$content);
+							$msg .= "----------------------------------------\n".
+								$content;
+
+							if (($count = substr_count($html, "下載附件")) > 2) {
+								$msg .= "\n".
+									"----------------------------------------\n".
+									"本文章有".(($count-2)/2)."個附件";
+								preg_match_all('/<a href="\/bin\/downloadfile.php\?file=[^"]+" title="[^"]+" target="_blank">(.+?)<\/a>/', $html, $m);
+								foreach ($m[1] as $filename) {
+									if ($filename !== "下載附件") {
+										$msg .= "\n".$filename;
+									}
+								}
+								$msg .= "\n請前往文章下載：".$news["url"];
+							}
+
+							SendMessage($tmid, $msg);
 						} else {
 							SendMessage($tmid, "連結不是校方網站，因此無法預覽\n".
 								"請直接自行點選連結查看\n".
