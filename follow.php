@@ -102,17 +102,14 @@ foreach ($row as $data) {
 				continue;
 			}
 			$msg = $messaging['message']['text'];
-			if ($msg[0] !== "/") {
-				SendMessage($tmid, "無法辨識的訊息\n".
-					"本粉專由機器人自動運作\n".
-					"啟用訊息通知輸入 /start\n".
-					"顯示所有命令輸入 /help");
-				continue;
+			if ($msg[0] === "/") {
+				SendMessage($tmid, "提醒您，命令已經不需要再加上 / 前綴，而且將在不久後不支援包含斜線的命令");
 			}
 			$msg = str_replace("\n", " ", $msg);
 			$msg = preg_replace("/\s+/", " ", $msg);
 			$cmd = explode(" ", $msg);
 			switch ($cmd[0]) {
+				case 'start':
 				case '/start':
 					if (isset($cmd[1])) {
 						SendMessage($tmid, "參數個數錯誤\n".
@@ -131,6 +128,7 @@ foreach ($row as $data) {
 					}
 					break;
 				
+				case 'stop':
 				case '/stop':
 					if (isset($cmd[1])) {
 						SendMessage($tmid, "參數個數錯誤\n".
@@ -149,6 +147,7 @@ foreach ($row as $data) {
 					}
 					break;
 				
+				case 'last':
 				case '/last':
 					$a = 0;
 					$b = 1;
@@ -230,6 +229,7 @@ foreach ($row as $data) {
 					}
 					break;
 
+				case 'link':
 				case '/link':
 					if (isset($cmd[1])) {
 						if (preg_match("/^\d+$/", $cmd[1]) == 0) {
@@ -263,6 +263,7 @@ foreach ($row as $data) {
 					}
 					break;
 
+				case 'archive':
 				case '/archive':
 					if (!isset($cmd[1])) {
 						SendMessage($tmid, "參數不足\n".
@@ -310,6 +311,7 @@ foreach ($row as $data) {
 					}
 					break;
 
+				case 'show':
 				case '/show':
 					if (!isset($cmd[1])) {
 						SendMessage($tmid, "參數不足\n".
@@ -399,7 +401,13 @@ foreach ($row as $data) {
 						SendMessage($tmid, "命令失敗");
 					}
 					break;
+
+				case 'report':
+				case '/report':
+					SendMessage($tmid, "請將錯誤報告及意見回饋傳送至 https://m.me/xiplus.dev");
+					break;
 				
+				case 'help':
 				case '/help':
 					if (isset($cmd[2])) {
 						$msg = "參數過多\n".
@@ -407,46 +415,46 @@ foreach ($row as $data) {
 					} else if (isset($cmd[1])) {
 						switch ($cmd[1]) {
 							case 'start':
-								$msg = "/start 啟用訊息通知";
+								$msg = "start 啟用訊息通知";
 								break;
 							
 							case 'stop':
-								$msg = "/stop 停用訊息通知";
+								$msg = "stop 停用訊息通知";
 								break;
 							
 							case 'last':
-								$msg = "/last 顯示最後一筆通知\n".
-									"/last [count] 顯示最後[count]筆通知\n".
-									"/last [offset] [count] 略過最後[offset]筆，顯示[count]筆通知\n".
+								$msg = "last 顯示最後一筆通知\n".
+									"last [count] 顯示最後[count]筆通知\n".
+									"last [offset] [count] 略過最後[offset]筆，顯示[count]筆通知\n".
 									"([count]至多".$C['/last_limit'].")\n\n".
 									"範例：\n".
-									"/last 顯示最後一筆\n".
-									"/last 3 顯示最後3筆\n".
-									"/last 5 3 顯示最後6~8筆";
+									"last 顯示最後一筆\n".
+									"last 3 顯示最後3筆\n".
+									"last 5 3 顯示最後6~8筆";
 								break;
 							
 							case 'link':
-								$msg = "/link 顯示最後一筆通知的連結\n".
-									 "/link [id] 顯示編號[id]的連結\n\n".
+								$msg = "link 顯示最後一筆通知的連結\n".
+									 "link [id] 顯示編號[id]的連結\n\n".
 									"範例：\n".
-									"/link 顯示最後一筆\n".
-									"/link 12345 顯示編號12345";
+									"link 顯示最後一筆\n".
+									"link 12345 顯示編號12345";
 								break;
 							
 							case 'archive':
-								$msg = "/archive [id] 顯示編號[id]的存檔連結\n\n".
+								$msg = "archive [id] 顯示編號[id]的存檔連結\n\n".
 									"範例：\n".
-									"/archive 12345 顯示編號12345";
+									"archive 12345 顯示編號12345";
 								break;
 							
 							case 'show':
-								$msg = "/show [id] 顯示編號[id]的內文\n\n".
+								$msg = "show [id] 顯示編號[id]的內文\n\n".
 									"範例：\n".
-									"/show 12345 顯示編號12345";
+									"show 12345 顯示編號12345";
 								break;
 							
 							case 'help':
-								$msg = "/help 顯示所有命令";
+								$msg = "help 顯示所有命令";
 								break;
 							
 							default:
@@ -455,23 +463,26 @@ foreach ($row as $data) {
 						}
 					} else {
 						$msg = "可用命令\n".
-						"/start 啟用訊息通知\n".
-						"/stop 停用訊息通知\n".
-						"/last 顯示舊通知\n".
-						"/link 顯示通知的連結\n".
-						"/archive 顯示通知的存檔連結\n".
-						"/show 顯示通知的內文\n".
-						"/help 顯示所有命令\n\n".
-						"/help [命令] 顯示命令的詳細用法\n".
-						"範例： /help link";
+						"start 啟用訊息通知\n".
+						"stop 停用訊息通知\n".
+						"last 顯示舊通知\n".
+						"link 顯示通知的連結\n".
+						"archive 顯示通知的存檔連結\n".
+						"show 顯示通知的內文\n".
+						"help 顯示所有命令\n\n".
+						"help [命令] 顯示命令的詳細用法\n".
+						"範例： help link";
 					}
 					SendMessage($tmid, $msg);
 					break;
 				
 				default:
-					SendMessage($tmid, "無法辨識命令\n".
-						"輸入 /help 取得可用命令");
-					break;
+					SendMessage($tmid, "無法辨識的命令\n".
+						"本粉專由機器人自動運作\n".
+						"啟用訊息通知輸入 start\n".
+						"顯示所有命令輸入 help\n".
+						"錯誤報告或回饋意見輸入 report");
+					continue;
 			}
 		}
 	}
