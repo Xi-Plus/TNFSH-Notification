@@ -347,7 +347,7 @@ foreach ($row as $data) {
 
 							$p = strpos($html, '<div class="ptcontent');
 							if ($p === false) {
-								SendMessage($tmid, "解析網頁失敗，此問題修復後將會收到通知\n".
+								SendMessage($tmid, "解析網頁失敗，請將此問題報告到 Messenger @xiplus.dev\n".
 									"請直接自行點選連結查看\n".
 									$news["url"]);
 								continue;
