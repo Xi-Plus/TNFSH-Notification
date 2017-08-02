@@ -469,6 +469,7 @@ foreach ($row as $data) {
 						"link 顯示通知的連結\n".
 						"archive 顯示通知的存檔連結\n".
 						"show 顯示通知的內文\n".
+						"report 錯誤報告或回饋意見\n".
 						"help 顯示所有命令\n\n".
 						"help [命令] 顯示命令的詳細用法\n".
 						"範例： help link";
