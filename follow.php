@@ -482,7 +482,7 @@ foreach ($row as $data) {
 						"啟用訊息通知輸入 start\n".
 						"顯示所有命令輸入 help\n".
 						"錯誤報告或回饋意見輸入 report");
-					continue;
+					break;
 			}
 		}
 	}
