@@ -163,9 +163,9 @@ foreach ($row as $data) {
 								"回傳筆數應該大於等於1");
 							continue;
 						}
-						if ($b > $C['/last_limit']) {
+						if ($b > $C['last_limit']) {
 							SendMessage($tmid, "第1個參數錯誤\n".
-								"回傳筆數至多".$C['/last_limit']."筆");
+								"回傳筆數至多".$C['last_limit']."筆");
 							continue;
 						}
 					}
@@ -192,9 +192,9 @@ foreach ($row as $data) {
 								"回傳筆數應該大於等於1，例如 /last 10 3 顯示3筆通知");
 							continue;
 						}
-						if ($b > $C['/last_limit']) {
+						if ($b > $C['last_limit']) {
 							SendMessage($tmid, "第2個參數錯誤\n".
-								"回傳筆數至多".$C['/last_limit']."筆");
+								"回傳筆數至多".$C['last_limit']."筆");
 							continue;
 						}
 					}
@@ -426,7 +426,7 @@ foreach ($row as $data) {
 								$msg = "last 顯示最後一筆通知\n".
 									"last [count] 顯示最後[count]筆通知\n".
 									"last [offset] [count] 略過最後[offset]筆，顯示[count]筆通知\n".
-									"([count]至多".$C['/last_limit'].")\n\n".
+									"([count]至多".$C['last_limit'].")\n\n".
 									"範例：\n".
 									"last 顯示最後一筆\n".
 									"last 3 顯示最後3筆\n".
