@@ -121,7 +121,7 @@ foreach ($row as $data) {
 					$res = $sth->execute();
 					if ($res) {
 						SendMessage($tmid, "已啟用訊息通知\n".
-							"欲取消請輸入 /stop");
+							"欲取消請輸入 stop");
 					} else {
 						WriteLog("[follow][error][start][upduse] uid=".$uid);
 						SendMessage($tmid, "命令失敗");
@@ -140,7 +140,7 @@ foreach ($row as $data) {
 					$res = $sth->execute();
 					if ($res) {
 						SendMessage($tmid, "已停用訊息通知\n".
-							"欲重新啟用請輸入 /start");
+							"欲重新啟用請輸入 start");
 					} else {
 						WriteLog("[follow][error][stop][upduse] uid=".$uid);
 						SendMessage($tmid, "命令失敗");
