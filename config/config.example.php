@@ -18,6 +18,7 @@ $C['DBpass'] = 'pass';
 $C['DBTBprefix'] = 'tnfsh_notification_';
 
 $C['Pagename'] = "Tnfsh公佈欄通知";
+$C['PagenameTG'] = "TNFSH公佈欄通知";
 
 $C['UnreadLimit'] = 86400*7;
 $C['UnreadLimitText'] = "7天";
